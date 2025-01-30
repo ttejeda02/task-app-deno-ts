@@ -25,6 +25,11 @@ export const createTask = async (task: Task) => {
   return result;
 };
 
+export const readTask = async () => {
+  const tasks = await client.execute(`SELECT * FROM task`);
+  return tasks as Task[];
+}
+
 export const updateTask = async (task: Task) => {
   const result = await client.execute(
     `UPDATE task SET title = ?, description = ?, status = ?, priority = ? WHERE id = ?;`,
@@ -35,6 +40,14 @@ export const updateTask = async (task: Task) => {
       task.priority,
       task.id
     ]
+  )
+
+  return result;
+}
+
+export const deleteTask = async (task: Task) => {
+  const result = await client.execute(
+    `DELETE FROM task WHERE id = ${task.id};`
   )
 
   return result;
