@@ -24,3 +24,18 @@ export const createTask = async (task: Task) => {
 
   return result;
 };
+
+export const updateTask = async (task: Task) => {
+  const result = await client.execute(
+    `UPDATE task SET title = ?, description = ?, status = ?, priority = ? WHERE id = ?;`,
+    [
+      task.title,
+      task.description,
+      task.status,
+      task.priority,
+      task.id
+    ]
+  )
+
+  return result;
+}
