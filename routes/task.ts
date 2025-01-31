@@ -31,15 +31,15 @@ taskRouter
   })
   .get("/tasks/:id", async (context) => {
     try {
-      const { id } = context.params
-      const result = (await getTaskById(parseInt(id))).rows
+      const { id } = context.params;
+      const result = (await getTaskById(parseInt(id))).rows;
 
-      context.response.status = 200
-      context.response.body = { message: "Task founded", task: result}
+      context.response.status = 200;
+      context.response.body = { message: "Task founded", task: result };
     } catch (_error) {
-        context.response.status = 400;
-        context.response.body = { error: "Error getting task" }
+      context.response.status = 400;
+      context.response.body = { error: "Error getting task" };
     }
-  })
+  });
 
 export default taskRouter;
