@@ -1,5 +1,5 @@
 import { Router } from "oak";
-import { createTask, getTasks } from "../models/TaskModel.ts";
+import { createTask, getTaskById, getTasks } from "../models/TaskModel.ts";
 import { Task } from "../models/Task.ts";
 
 const taskRouter = new Router();
@@ -28,6 +28,18 @@ taskRouter
       context.response.status = 400;
       context.response.body = { error: "Error creating task" };
     }
-  });
+  })
+  .get("/tasks/:id", async (context) => {
+    try {
+      const { id } = context.params
+      const result = (await getTaskById(parseInt(id))).rows
+
+      context.response.status = 200
+      context.response.body = { message: "Task founded", task: result}
+    } catch (_error) {
+        context.response.status = 400;
+        context.response.body = { error: "Error getting task" }
+    }
+  })
 
 export default taskRouter;
