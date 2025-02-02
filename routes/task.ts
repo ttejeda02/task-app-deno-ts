@@ -1,77 +1,77 @@
 import { Router } from "oak";
 import {
   createTask,
+  deleteTask,
   getTaskById,
   getTasks,
   updateTask,
-  deleteTask
 } from "../models/TaskModel.ts";
 import { Task } from "../models/Task.ts";
 
 const taskRouter = new Router();
 
 taskRouter
-  .get("/tasks", async (context) => {
+  .get("/tasks", async (ctx) => {
     try {
       const tasks = await getTasks();
 
-      context.response.status = 200;
-      context.response.body = tasks;
+      ctx.response.status = 200;
+      ctx.response.body = tasks;
     } catch (_error) {
-      context.response.status = 500;
-      context.response.body = { error: "Error fetching tasks" };
+      ctx.response.status = 500;
+      ctx.response.body = { error: "Error fetching tasks" };
     }
   })
-  .post("/tasks", async (context) => {
+  .post("/tasks", async (ctx) => {
     try {
-      const body = await context.request.body.text();
+      const body = await ctx.request.body.text();
       const newTask: Task = JSON.parse(body);
       const result = await createTask(newTask);
 
-      context.response.status = 201;
-      context.response.body = { message: "Task created", task: result };
+      ctx.response.status = 201;
+      ctx.response.body = { message: "Task created", task: result };
     } catch (_error) {
-      context.response.status = 400;
-      context.response.body = { error: "Error creating task" };
+      ctx.response.status = 400;
+      ctx.response.body = { error: "Error creating task" };
     }
   })
-  .get("/tasks/:id", async (context) => {
+  .get("/tasks/:id", async (ctx) => {
     try {
-      const { id } = context.params;
+      const { id } = ctx.params;
       const result = (await getTaskById(parseInt(id))).rows;
 
-      context.response.status = 200;
-      context.response.body = { message: "Task found", task: result };
+      ctx.response.status = 200;
+      ctx.response.body = { message: "Task found", task: result };
     } catch (_error) {
-      context.response.status = 400;
-      context.response.body = { error: "Error getting task" };
+      ctx.response.status = 400;
+      ctx.response.body = { error: "Error getting task" };
     }
   })
-  .put("/tasks/:id", async (context) => {
+  .put("/tasks/:id", async (ctx) => {
     try {
-      const { id } = context.params;
-      const body = await context.request.body.text();
+      const { id } = ctx.params;
+      const body = await ctx.request.body.text();
       const newInfoTask: Task = JSON.parse(body);
       const result = await updateTask(parseInt(id), newInfoTask);
 
-      context.response.body = 200;
-      context.response.body = { message: "Task updated", task: result };
+      ctx.response.body = 200;
+      ctx.response.body = { message: "Task updated", task: result };
     } catch (_error) {
-      context.response.status = 400;
-      context.response.body = { message: "Error updating task" };
+      ctx.response.status = 400;
+      ctx.response.body = { message: "Error updating task" };
     }
   })
-  .delete("/tasks/:id", async (context) => {
+  .delete("/tasks/:id", async (ctx) => {
     try {
-      const { id } = context.params
-      const result = await deleteTask(parseInt(id))
+      const { id } = ctx.params;
+      const result = await deleteTask(parseInt(id));
 
-      context.response.body = 200
-      context.response.body = { message: "Task deleted", task: result}
+      ctx.response.body = 200;
+      ctx.response.body = { message: "Task deleted", task: result };
     } catch (_error) {
-      context.response.status = 400
-      context.response.body = { message: "Error deleting task" }
+      ctx.response.status = 400;
+      ctx.response.body = { message: "Error deleting task" };
     }
-  })
-  
+  });
+
 export default taskRouter;
