@@ -4,6 +4,7 @@ import {
   getTaskById,
   getTasks,
   updateTask,
+  deleteTask
 } from "../models/TaskModel.ts";
 import { Task } from "../models/Task.ts";
 
@@ -59,5 +60,18 @@ taskRouter
       context.response.status = 400;
       context.response.body = { message: "Error updating task" };
     }
-  });
+  })
+  .delete("/tasks/:id", async (context) => {
+    try {
+      const { id } = context.params
+      const result = await deleteTask(parseInt(id))
+
+      context.response.body = 200
+      context.response.body = { message: "Task deleted", task: result}
+    } catch (_error) {
+      context.response.status = 400
+      context.response.body = { message: "Error deleting task" }
+    }
+  })
+  
 export default taskRouter;
