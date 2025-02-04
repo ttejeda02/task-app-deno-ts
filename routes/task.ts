@@ -17,14 +17,14 @@ taskRouter
 
       ctx.response.status = 200;
       if (tasks.length == 0) {
-        ctx.response.body = { tasks: tasks };
+        ctx.response.body = { status: "success", message: "No tasks found", tasks: tasks };
         return;
       }
 
-      ctx.response.body = { message: "Tasks found", tasks: tasks };
+      ctx.response.body = { status: "success", message: "Tasks found", tasks: tasks };
     } catch (_error) {
       ctx.response.status = 500;
-      ctx.response.body = { error: "Error fetching tasks" };
+      ctx.response.body = { status: "error", message: "Error fetching tasks" };
     }
   })
   .post("/tasks", async (ctx) => {
@@ -36,24 +36,24 @@ taskRouter
 
       if (validateTaskResult) {
         ctx.response.status = 400;
-        ctx.response.body = { message: validateTaskResult };
+        ctx.response.body = { status: "error", message: validateTaskResult };
         return;
       }
 
       const result = await createTask(newTask);
       if (result.lastInsertId == undefined) {
         ctx.response.status = 500;
-        ctx.response.body = { error: "Internal server error" };
+        ctx.response.body = { status: "error", message: "Internal server error" };
         return;
       }
 
       const task = (await getTaskById(result.lastInsertId)).rows;
 
       ctx.response.status = 201;
-      ctx.response.body = { message: "Task created", task: task };
+      ctx.response.body = { status: "success", message: "Task created", task: task };
     } catch (_error) {
       ctx.response.status = 400;
-      ctx.response.body = { error: "Error creating task" };
+      ctx.response.body = { status: "error", message: "Error creating task" };
     }
   })
   .get("/tasks/:id", async (ctx) => {
@@ -63,15 +63,15 @@ taskRouter
       const result = (await getTaskById(parseInt(id))).rows;
       if (result?.length == 0) {
         ctx.response.status = 404;
-        ctx.response.body = { message: `Task with ID ${id} not found` };
+        ctx.response.body = { status: "error", message: `Task with ID ${id} not found` };
         return;
       }
 
       ctx.response.status = 200;
-      ctx.response.body = { message: "Task found", task: result };
+      ctx.response.body = { status: "success", message: "Task found", task: result };
     } catch (_error) {
       ctx.response.status = 400;
-      ctx.response.body = { error: "Error getting task" };
+      ctx.response.body = { status: "error", message: "Error getting task" };
     }
   })
   .put("/tasks/:id", async (ctx) => {
@@ -83,24 +83,24 @@ taskRouter
       const validateTaskResult = validateTask(newInfoTask);
       if (validateTaskResult) {
         ctx.response.status = 400;
-        ctx.response.body = { message: validateTaskResult };
+        ctx.response.body = { status: "error", message: validateTaskResult };
         return;
       }
 
       const result = await updateTask(parseInt(id), newInfoTask);
       if (result.affectedRows == 0) {
         ctx.response.status = 404;
-        ctx.response.body = { message: "Task not found" };
+        ctx.response.body = { status: "error", message: "Task not found" };
         return;
       }
 
       const task = (await getTaskById(parseInt(id))).rows;
 
       ctx.response.status = 200;
-      ctx.response.body = { message: "Task updated", task: task };
+      ctx.response.body = { status: "success", message: "Task updated", task: task };
     } catch (_error) {
       ctx.response.status = 400;
-      ctx.response.body = { message: "Error updating task" };
+      ctx.response.body = { status: "error", message: "Error updating task" };
     }
   })
   .delete("/tasks/:id", async (ctx) => {
@@ -110,15 +110,15 @@ taskRouter
 
       if (result.affectedRows == 0) {
         ctx.response.status = 404;
-        ctx.response.body = { message: "Task not found" };
+        ctx.response.body = { status: "error", message: "Task not found" };
         return;
       }
 
       ctx.response.status = 200;
-      ctx.response.body = { message: "Task deleted", taskId: id };
+      ctx.response.body = { status: "success",  message: "Task deleted", taskId: id };
     } catch (_error) {
       ctx.response.status = 400;
-      ctx.response.body = { message: "Error deleting task" };
+      ctx.response.body = { status: "error", message: "Error deleting task" };
     }
   });
 
