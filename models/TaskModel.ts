@@ -2,15 +2,20 @@ import { Client } from "mysql";
 import { Task } from "./Task.ts";
 import "@std/dotenv";
 
-const client = new Client();
-await client.connect({
-  hostname: Deno.env.get("DB_HOST"),
-  username: Deno.env.get("DB_USER"),
-  db: Deno.env.get("DB_NAME"),
-  password: Deno.env.get("DB_PASSWORD"),
-});
+export const createDBClient = async (): Promise<Client> => {
+  const client = new Client();
+  await client.connect({
+    hostname: Deno.env.get("DB_HOST"),
+    username: Deno.env.get("DB_USER"),
+    db: Deno.env.get("DB_NAME"),
+    password: Deno.env.get("DB_PASSWORD"),
+    poolSize: 3,
+  });
 
-export const createTask = async (task: Task) => {
+  return client;
+};
+
+export const createTask = async (client: Client, task: Task) => {
   const result = await client.execute(
     `INSERT INTO task (title, description, status, priority, id_user) VALUES (?, ?, ?, ?, ?);`,
     [
@@ -25,19 +30,19 @@ export const createTask = async (task: Task) => {
   return result;
 };
 
-export const getTaskById = async (id: number) => {
+export const getTaskById = async (client: Client, id: number) => {
   const task = await client.execute(`SELECT * FROM task WHERE id = ${id}`);
 
-  return task;
+  return task.rows;
 };
 
-export const getTasks = async () => {
+export const getTasks = async (client: Client) => {
   const tasks = await client.execute(`SELECT * FROM task`);
 
   return tasks.rows as Task[];
 };
 
-export const updateTask = async (id: number, task: Task) => {
+export const updateTask = async (client: Client, id: number, task: Task) => {
   const result = await client.execute(
     `UPDATE task SET title = ?, description = ?, status = ?, priority = ? WHERE id = ?;`,
     [
@@ -52,7 +57,7 @@ export const updateTask = async (id: number, task: Task) => {
   return result;
 };
 
-export const deleteTask = async (id: number) => {
+export const deleteTask = async (client: Client, id: number) => {
   const result = await client.execute(
     `DELETE FROM task WHERE id = ${id};`,
   );

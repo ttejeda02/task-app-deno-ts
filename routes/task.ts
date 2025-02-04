@@ -1,5 +1,6 @@
 import { Router } from "oak";
 import {
+  createDBClient,
   createTask,
   deleteTask,
   getTaskById,
@@ -10,18 +11,28 @@ import { Task } from "../models/Task.ts";
 
 const taskRouter = new Router();
 
+const client = await createDBClient();
+
 taskRouter
   .get("/tasks", async (ctx) => {
     try {
-      const tasks = await getTasks();
+      const tasks = await getTasks(client);
 
       ctx.response.status = 200;
       if (tasks.length == 0) {
-        ctx.response.body = { status: "success", message: "No tasks found", tasks: tasks };
+        ctx.response.body = {
+          status: "success",
+          message: "No tasks found",
+          tasks: tasks,
+        };
         return;
       }
 
-      ctx.response.body = { status: "success", message: "Tasks found", tasks: tasks };
+      ctx.response.body = {
+        status: "success",
+        message: "Tasks found",
+        tasks: tasks,
+      };
     } catch (_error) {
       ctx.response.status = 500;
       ctx.response.body = { status: "error", message: "Error fetching tasks" };
@@ -40,17 +51,24 @@ taskRouter
         return;
       }
 
-      const result = await createTask(newTask);
+      const result = await createTask(client, newTask);
       if (result.lastInsertId == undefined) {
         ctx.response.status = 500;
-        ctx.response.body = { status: "error", message: "Internal server error" };
+        ctx.response.body = {
+          status: "error",
+          message: "Internal server error",
+        };
         return;
       }
 
-      const task = (await getTaskById(result.lastInsertId)).rows;
+      const task = await getTaskById(client, result.lastInsertId);
 
       ctx.response.status = 201;
-      ctx.response.body = { status: "success", message: "Task created", task: task };
+      ctx.response.body = {
+        status: "success",
+        message: "Task created",
+        task: task,
+      };
     } catch (_error) {
       ctx.response.status = 400;
       ctx.response.body = { status: "error", message: "Error creating task" };
@@ -60,15 +78,22 @@ taskRouter
     try {
       const { id } = ctx.params;
 
-      const result = (await getTaskById(parseInt(id))).rows;
+      const result = await getTaskById(client, parseInt(id));
       if (result?.length == 0) {
         ctx.response.status = 404;
-        ctx.response.body = { status: "error", message: `Task with ID ${id} not found` };
+        ctx.response.body = {
+          status: "error",
+          message: `Task with ID ${id} not found`,
+        };
         return;
       }
 
       ctx.response.status = 200;
-      ctx.response.body = { status: "success", message: "Task found", task: result };
+      ctx.response.body = {
+        status: "success",
+        message: "Task found",
+        task: result,
+      };
     } catch (_error) {
       ctx.response.status = 400;
       ctx.response.body = { status: "error", message: "Error getting task" };
@@ -87,17 +112,21 @@ taskRouter
         return;
       }
 
-      const result = await updateTask(parseInt(id), newInfoTask);
+      const result = await updateTask(client, parseInt(id), newInfoTask);
       if (result.affectedRows == 0) {
         ctx.response.status = 404;
         ctx.response.body = { status: "error", message: "Task not found" };
         return;
       }
 
-      const task = (await getTaskById(parseInt(id))).rows;
+      const task = await getTaskById(client, parseInt(id));
 
       ctx.response.status = 200;
-      ctx.response.body = { status: "success", message: "Task updated", task: task };
+      ctx.response.body = {
+        status: "success",
+        message: "Task updated",
+        task: task,
+      };
     } catch (_error) {
       ctx.response.status = 400;
       ctx.response.body = { status: "error", message: "Error updating task" };
@@ -106,7 +135,7 @@ taskRouter
   .delete("/tasks/:id", async (ctx) => {
     try {
       const { id } = ctx.params;
-      const result = await deleteTask(parseInt(id));
+      const result = await deleteTask(client, parseInt(id));
 
       if (result.affectedRows == 0) {
         ctx.response.status = 404;
@@ -115,7 +144,11 @@ taskRouter
       }
 
       ctx.response.status = 200;
-      ctx.response.body = { status: "success",  message: "Task deleted", taskId: id };
+      ctx.response.body = {
+        status: "success",
+        message: "Task deleted",
+        taskId: id,
+      };
     } catch (_error) {
       ctx.response.status = 400;
       ctx.response.body = { status: "error", message: "Error deleting task" };
