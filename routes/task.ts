@@ -1,6 +1,5 @@
 import { Router } from "oak";
 import {
-  createDBClient,
   createTask,
   deleteTask,
   getTaskById,
@@ -8,10 +7,12 @@ import {
   updateTask,
 } from "../models/TaskModel.ts";
 import { Task } from "../models/Task.ts";
+import { createDbConnection } from "../db/dbConnection.ts";
+
 
 const taskRouter = new Router();
 
-const client = await createDBClient();
+const client = await createDbConnection();
 
 taskRouter
   .get("/tasks", async (ctx) => {

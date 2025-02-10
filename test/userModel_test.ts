@@ -1,5 +1,4 @@
 import { assertEquals, assertNotEquals } from "@std/assert";
-import { createDBClient } from "../models/TaskModel.ts";
 import {
   createUser,
   deleteUser,
@@ -7,6 +6,8 @@ import {
   updateUser,
 } from "../models/UserModel.ts";
 import { User } from "../models/User.ts";
+import { createDbConnection } from "../db/dbConnection.ts";
+
 
 const newUser: User = {
   id: 0,
@@ -29,7 +30,7 @@ const updatedUser: User = {
 Deno.test({
   name: "database operation user table",
   fn: async (t) => {
-    const client = await createDBClient();
+    const client = await createDbConnection();
 
     //insert into user
     await t.step("create new user", async () => {

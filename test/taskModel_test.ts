@@ -1,6 +1,5 @@
 import { assertEquals, assertNotEquals } from "@std/assert";
 import {
-  createDBClient,
   createTask,
   deleteTask,
   getTaskById,
@@ -8,6 +7,8 @@ import {
   updateTask,
 } from "../models/TaskModel.ts";
 import { Task } from "../models/Task.ts";
+import { createDbConnection } from "../db/dbConnection.ts";
+
 
 const newTask: Task = {
   id: 0, // id field is auto-increment
@@ -34,7 +35,7 @@ const updatedTask: Task = {
 Deno.test({
   name: "database operation task table",
   fn: async (t) => {
-    const client = await createDBClient();
+    const client = await createDbConnection();
 
     //select * from task
     await t.step("select * from tasks", async () => {

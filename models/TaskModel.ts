@@ -2,18 +2,6 @@ import { Client } from "mysql";
 import { Task } from "./Task.ts";
 import "@std/dotenv";
 
-export const createDBClient = async (): Promise<Client> => {
-  const client = new Client();
-  await client.connect({
-    hostname: Deno.env.get("DB_HOST"),
-    username: Deno.env.get("DB_USER"),
-    db: Deno.env.get("DB_NAME"),
-    password: Deno.env.get("DB_PASSWORD"),
-    poolSize: 3,
-  });
-
-  return client;
-};
 
 export const createTask = async (client: Client, task: Task) => {
   const result = await client.execute(
