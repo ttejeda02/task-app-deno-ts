@@ -9,7 +9,6 @@ import {
 import { Task } from "../models/Task.ts";
 import { createDbConnection } from "../db/dbConnection.ts";
 
-
 const taskRouter = new Router();
 
 const client = await createDbConnection();

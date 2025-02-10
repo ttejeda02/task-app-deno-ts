@@ -2,7 +2,6 @@ import { Client } from "mysql";
 import { Task } from "./Task.ts";
 import "@std/dotenv";
 
-
 export const createTask = async (client: Client, task: Task) => {
   const result = await client.execute(
     `INSERT INTO task (title, description, status, priority, id_user) VALUES (?, ?, ?, ?, ?);`,

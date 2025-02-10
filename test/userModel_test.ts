@@ -8,7 +8,6 @@ import {
 import { User } from "../models/User.ts";
 import { createDbConnection } from "../db/dbConnection.ts";
 
-
 const newUser: User = {
   id: 0,
   name: "eonoz",

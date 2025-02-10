@@ -9,7 +9,6 @@ import {
 import { Task } from "../models/Task.ts";
 import { createDbConnection } from "../db/dbConnection.ts";
 
-
 const newTask: Task = {
   id: 0, // id field is auto-increment
   title: "Create task test",
