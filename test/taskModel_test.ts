@@ -46,7 +46,7 @@ Deno.test({
 
         console.log("Get tasks was completed successfully");
       } catch (error) {
-        console.error("Error to execute readTask", error);
+        console.error("Error to execute getTasks", error);
       }
     });
 
@@ -76,7 +76,7 @@ Deno.test({
 
         console.log("The task was found successfully;", result);
       } catch (error) {
-        console.error("Error to execute updateTask", error);
+        console.error("Error to execute getTaskById", error);
       }
     });
 
@@ -102,9 +102,9 @@ Deno.test({
         assertNotEquals(result, undefined);
         assertNotEquals(result, null);
 
-        console.log("Every taks obtained:", result);
+        console.log("The task was deleted successfully", result);
       } catch (error) {
-        console.error("Error to execute readTask", error);
+        console.error("Error to execute deleteTask", error);
       }
     });
 
