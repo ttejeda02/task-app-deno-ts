@@ -1,5 +1,6 @@
 import { Application, Router } from "oak";
 import taskRouter from "./routes/task.ts";
+import userRouter from "./routes/uset.ts";
 import "@std/dotenv";
 
 const app = new Application();
@@ -14,6 +15,9 @@ app.use(router1.allowedMethods());
 
 app.use(taskRouter.routes());
 app.use(taskRouter.allowedMethods());
+
+app.use(userRouter.routes());
+app.use(userRouter.allowedMethods());
 
 const PORT = 8000;
 console.log(`Server running in port ${PORT}`);
