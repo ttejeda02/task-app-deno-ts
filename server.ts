@@ -1,6 +1,6 @@
 import { Application, Router } from "oak";
 import taskRouter from "./routes/task.ts";
-import userRouter from "./routes/uset.ts";
+import userRouter from "./routes/user.ts";
 import "@std/dotenv";
 
 const app = new Application();

@@ -1,6 +1,7 @@
 import { Router } from "oak";
-import { getUserById } from "../models/UserModel.ts";
+import { createUser, getUserById } from "../models/UserModel.ts";
 import { createDbConnection } from "../db/dbConnection.ts";
+import { User } from "../models/User.ts";
 
 const userRouter = new Router();
 
@@ -34,6 +35,68 @@ userRouter
         message: "Error getting user",
       };
     }
+  })
+  .post("/user", async (ctx) => {
+    try {
+      const body = await ctx.request.body.text();
+
+      const newUser: User = JSON.parse(body);
+      const validateUserResult = validateUser(newUser);
+
+      if (validateUserResult) {
+        ctx.response.status = 400;
+        ctx.response.body = {
+          status: "error",
+          message: validateUserResult,
+        };
+        return;
+      }
+
+      const result = await createUser(client, newUser);
+      if (result.lastInsertId == undefined) {
+        ctx.response.status = 500;
+        ctx.response.body = {
+          status: "error",
+          message: "Internal server error",
+        };
+        return;
+      }
+
+      const user = await getUserById(client, result.lastInsertId);
+
+      ctx.response.status = 201;
+      ctx.response.body = {
+        status: "success",
+        message: "User created",
+        user: user,
+      };
+    } catch (_error) {
+      ctx.response.status = 400;
+      ctx.response.body = {
+        status: "error",
+        message: "Error creating user",
+      };
+    }
   });
+
+function validateUser(user: User): string | null {
+  //Validate name
+  if (!user.name || user.name.trim() == "") {
+    return "Name is required";
+  }
+
+  //Validate email
+  const mailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!mailRegex.test(user.mail) || !user.mail || user.mail.trim() == "") {
+    return "Email is required or is invalid";
+  }
+
+  //Validate password
+  if (!user.password || user.password.trim() == "") {
+    return "Password is required";
+  }
+
+  return null;
+}
 
 export default userRouter;
