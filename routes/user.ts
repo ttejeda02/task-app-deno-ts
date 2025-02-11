@@ -1,5 +1,10 @@
 import { Router } from "oak";
-import { createUser, getUserById, updateUser } from "../models/UserModel.ts";
+import {
+  createUser,
+  deleteUser,
+  getUserById,
+  updateUser,
+} from "../models/UserModel.ts";
 import { createDbConnection } from "../db/dbConnection.ts";
 import { User } from "../models/User.ts";
 
@@ -117,6 +122,34 @@ userRouter
       ctx.response.body = {
         status: "error",
         message: "Error updating user",
+      };
+    }
+  })
+  .delete("/user/:id", async (ctx) => {
+    try {
+      const { id } = ctx.params;
+      const result = await deleteUser(client, parseInt(id));
+
+      if (result.affectedRows == 0) {
+        ctx.response.status = 404;
+        ctx.response.body = {
+          status: "error",
+          message: "User not found",
+        };
+        return;
+      }
+
+      ctx.response.status = 200;
+      ctx.response.body = {
+        status: "success",
+        message: "User deleted",
+        userId: id,
+      };
+    } catch (_error) {
+      ctx.response.status = 400;
+      ctx.response.body = {
+        status: "error",
+        message: "Error deleting user",
       };
     }
   });
