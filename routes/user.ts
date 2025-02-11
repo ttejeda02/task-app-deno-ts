@@ -1,5 +1,5 @@
 import { Router } from "oak";
-import { createUser, getUserById } from "../models/UserModel.ts";
+import { createUser, getUserById, updateUser } from "../models/UserModel.ts";
 import { createDbConnection } from "../db/dbConnection.ts";
 import { User } from "../models/User.ts";
 
@@ -75,6 +75,48 @@ userRouter
       ctx.response.body = {
         status: "error",
         message: "Error creating user",
+      };
+    }
+  })
+  .put("/user/:id", async (ctx) => {
+    try {
+      const { id } = ctx.params;
+      const body = await ctx.request.body.text();
+
+      const newInfoUser: User = JSON.parse(body);
+      const validateUserResult = validateUser(newInfoUser);
+      if (validateUserResult) {
+        ctx.response.status = 400;
+        ctx.response.body = {
+          status: "error",
+          message: validateUserResult,
+        };
+        return;
+      }
+
+      const result = await updateUser(client, parseInt(id), newInfoUser);
+      if (result.affectedRows == 0) {
+        ctx.response.status = 404;
+        ctx.response.body = {
+          status: "error",
+          message: "User not found",
+        };
+        return;
+      }
+
+      const user = await getUserById(client, parseInt(id));
+
+      ctx.response.status = 200;
+      ctx.response.body = {
+        status: "success",
+        message: "User updated",
+        user: user,
+      };
+    } catch (_error) {
+      ctx.response.status = 400;
+      ctx.response.body = {
+        status: "error",
+        message: "Error updating user",
       };
     }
   });
